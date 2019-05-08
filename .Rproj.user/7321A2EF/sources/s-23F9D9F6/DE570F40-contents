@@ -1,0 +1,87 @@
+set.seed(824)
+library(ggplot2)
+
+gen_dat = function(n){
+   x = rt(n,df = 6)
+   eps = rnorm(n, 0, 1)
+   y = -x + eps
+   return( list(x, y) )
+}
+
+n = 500
+n_draws = 500
+rs = c(10, 50, 100, 200, 300)
+
+plt_df = array(NA, dim=c(length(rs) * n_draws * 2, 3))
+
+par(mfrow=c(1, 2))
+plt_ind = 0
+for (r_ind in 1:length(rs)) {
+    r = rs[r_ind]
+    print(r)
+
+    lev_beta = array(NA, dim=c(n_draws, 2))
+    true_beta = array(NA, dim=c(n_draws, 2))
+    unif_beta = array(NA, dim=c(n_draws, 2))
+
+    for (draw in 1:n_draws) {
+        dat = gen_dat(n)
+        x = dat[[1]]
+        y = dat[[2]]
+        true_beta[draw, ] = lm(y ~ x)$coeff
+
+        X = cbind(rep(1, n), x)
+        H = X %*% solve(t(X) %*% X) %*% t(X)
+        lev = diag(H)
+        lev_probs = lev/sum(lev)
+
+        ## leveraged ##
+        subsample = sample(1:n, r, prob=lev_probs)
+        lev_beta[draw, ] = lm(y[subsample] ~ x[subsample], weights = 1/lev_probs[subsample])$coeff
+        plt_ind = plt_ind + 1
+        plt_df[plt_ind, ] =  c(r, "lev", abs(lev_beta[draw, 2] - true_beta[draw, 2]))
+
+        ## uniform ##
+        subsample = sample(1:n, r)
+        unif_beta[draw, ] = lm(y[subsample] ~ x[subsample])$coeff
+        plt_ind = plt_ind + 1
+        plt_df[plt_ind, ] =  c(r, "unif", abs(unif_beta[draw, 2] - true_beta[draw, 2]))
+
+    }
+
+
+    ## do some stuff for the one time plots down here ##
+
+    plot(x[-subsample], y[-subsample],
+         main = paste("Leverage Sample, r =", r),
+         xlab='x', ylab='y')
+    points(x[subsample], y[subsample], pch=3, col="green")
+    abline(lev_beta[draw, 1], lev_beta[draw, 2], lty=2, col="green", lwd=2.5)
+    abline(0, -1)
+
+    subsample = sample(1:n, r)
+    unif_beta[draw, ] = lm(y[subsample] ~ x[subsample])$coeff
+    plot(x[-subsample], y[-subsample],
+         main=paste("Uniform Sample, r =", r),
+         xlab = "x", ylab='y')
+    points(x[subsample], y[subsample], pch=3, col="red")
+    abline(unif_beta[draw, 1], unif_beta[draw, 2], lty=2, col="red", lwd=2.5)
+    abline(0, -1)
+
+}
+
+plt_df = data.frame(plt_df, stringsAsFactors = FALSE)
+plt_df[] <- lapply(plt_df, as.character)
+# plt_df[ , 1] = as.numeric(plt_df[, 1])
+plt_df[ , 3] = as.numeric(plt_df[, 3])
+colnames(plt_df) = c("R", "Type" ,"Error")
+plt_df$R <- factor(plt_df$R,
+                       levels = as.character(rs),ordered = TRUE)
+
+par(mfrow=c(1,1))
+plt = ggplot(plt_df, aes(x=R, y=Error, fill=Type)) +
+    geom_boxplot() + ggtitle("Boxplots of Errors") +
+    theme(legend.justification=c(1,1), legend.position=c(1,1),
+          legend.text = element_text(size = 16),
+          legend.title = element_text(size=20))
+plot(plt)

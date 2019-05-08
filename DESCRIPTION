@@ -1,0 +1,14 @@
+Package: HW2
+Type: Package
+Title: STSCI 6520: Homework 2
+Version: 0.1.0
+Author: Greg Benton
+Maintainer: Greg Benton <gwb67@cornell.edu>
+Description: Includes 
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    MASS,
+    doParallel
+RoxygenNote: 6.1.1

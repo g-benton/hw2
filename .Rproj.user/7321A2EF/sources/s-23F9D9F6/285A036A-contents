@@ -1,0 +1,49 @@
+library(doParallel)
+
+gen_A = function(n, alpha){
+    A = matrix(0, nrow=n, ncol=n)
+    diag(A) = rep(alpha, n)
+
+    del = row(A) - col(A)
+    A[abs(del) == 1] = -1
+    return(A)
+}
+
+ncore = detectCores() - 1
+# ncore = 2
+cl = makeCluster(ncore)
+registerDoParallel(cl)
+
+## main stuff ##
+par(mfrow=c(3,2))
+n = 100
+n_iters = 1000
+for (alpha in 1:3) {
+    A = gen_A(n, alpha)
+    v = as.matrix(rep(c(1,0), n/2))
+    norm_v = norm(v, type='f')
+    b = A %*% v
+    x_cur = as.matrix(rep(0, n))
+
+    errs = rep(0, n_iters)
+    times = rep(0, n_iters)
+    start = proc.time()[3]
+    for (iter in 1:n_iters) {
+
+        x_list = foreach(i=1:n) %dopar% {
+            x = (b[i, 1] - A[i, -i] %*% x_cur[-i])/A[i,i]
+        }
+        x_cur = unlist(x_list)
+        errs[iter] = norm(x_cur - v, type='f')
+        times[iter] = (proc.time() - start)[3]
+    }
+    plot(errs, type='l', lwd=2, col="steelblue",
+         xlab="Iteration", ylab="Relative Error",
+         main=paste("Alpha = ", alpha))
+    plot(times, errs, type='l', lwd=2, col="steelblue",
+         xlab="Time", ylab="Relative Error",
+         main=paste("Alpha = ", alpha))
+
+}
+title("Jacobi (Parallel)", outer=TRUE, cex.main=3)
+stopCluster(cl)
