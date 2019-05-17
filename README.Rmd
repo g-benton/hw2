@@ -8,10 +8,8 @@ output: github_document
 
 ```{r}
 library(devtools)
-# install_github("g-benton/hw2") # install the package
-# library(HW2) # load into the workspace
-build()
-install()
+install_github("g-benton/hw2") # install the package
+library(HW2) # load into the workspace
 ```
 
 ## Solve OLS
