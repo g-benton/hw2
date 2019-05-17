@@ -1,0 +1,13 @@
+{
+    "path" : "~/Google Drive/Spring 19/STSCI6520/HW2",
+    "sortOrder" : [
+        {
+            "ascending" : false,
+            "columnIndex" : 3
+        },
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}

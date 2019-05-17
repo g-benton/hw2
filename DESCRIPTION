@@ -10,5 +10,7 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     MASS,
-    doParallel
+    doParallel,
+    parallel,
+    foreach
 RoxygenNote: 6.1.1

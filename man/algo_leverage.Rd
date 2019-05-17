@@ -14,7 +14,7 @@ algo_leverage(x, y, subsample = "unif", r = 0)
 \item{subsample}{Should subsamples be taken uniformly or according to leverage
 scores? Options are 'unif' and 'lev'. Default='unif'}
 
-\item{r}{Size of subsample, defaults to ~10% of data}
+\item{r}{Size of subsample, defaults to ~10 percent of data}
 }
 \value{
 Returns lm class predicted

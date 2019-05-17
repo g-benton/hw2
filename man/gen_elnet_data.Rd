@@ -4,7 +4,7 @@
 \alias{gen_elnet_data}
 \title{Generates Data like used in HW1 to run elnet_coord}
 \usage{
-gen_elnet_data(n)
+gen_elnet_data(n = 50)
 }
 \arguments{
 \item{n}{number of data points to use}

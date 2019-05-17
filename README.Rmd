@@ -4,32 +4,64 @@ author: "Greg Benton"
 date: "5/7/2019"
 output: github_document
 ---
-## Solve OLS
+## Installation Instructions:
+
 ```{r}
-library(HW2)
-print("hey")
+library(devtools)
+# install_github("g-benton/hw2") # install the package
+# library(HW2) # load into the workspace
+build()
+install()
+```
+
+## Solve OLS
+
+First generate some simple data to test with: 100x100 matrix with 4's on diagonal and 1's on off diagonal with true solution vector (1,0,1,0,1...):
+```{r}
+A = gen_A(100, 4)
+x = as.matrix(rep(c(1,0), 50))
+b = A %*% x
+```
+
+Now using $A$ and $b$ approximate $x$. To run in parallel just specify ncores>1. 
+```{r}
+approx_x = jacobi_parallel(A, b, n_iters=100, ncores=1)
+print(paste("Error = ", norm(x - approx_x, 'f')))
 ```
 
 
-
 ## ALGO Leverage
+
+A data generator that generates data from the same setting as Ma and Sun (2014) https://onlinelibrary.wiley.com/doi/full/10.1002/wics.1324 is included as \verb|gen_dat|.
+
+First generate $x,y$ data and unpack the list,
 ```{r}
 dat = gen_dat(500)
 x = dat[[1]]
 y = dat[[2]]
+```
+
+Now run the algorithm to return the sub-sampled model. $r$ specifices the size of the subsample, and $subsample$ specifies the type of sampling to use, `lev' for leverage based 
+or `unif' for uniform sampling.
+```{r}
 algo_leverage(x, y, r=20, subsample='lev')
 ```
 
 
 
 ## Elastic Net Coordinate Descent
-
+Again there is a small data generator to generate data as we did in HW1, but any multiple linear regression problem will work
 ```{r}
 dat = gen_elnet_data(50)
 X = dat[[1]]
 y = dat[[2]]
+```
 
+Now run \verb|elnet_coord| to perform coordinate descent for an elastic net. $X$ and $y$ are the predictors and response for the regression problem, \verb|alpha| and \verb|lambda| specify the proportion of the 
+```{r}
 beta = elnet_coord(X, y, alpha=1, lambda = 1, n_iters = 100)
 print(beta)
 ```
+
+The true $\beta$ vector is $(2,0,-2,0,1,0,-1,0,...) \in \mathbb{R}^{20}$
 

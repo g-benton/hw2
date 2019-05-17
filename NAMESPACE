@@ -2,5 +2,9 @@
 
 export(algo_leverage)
 export(elnet_coord)
+export(gen_A)
 export(gen_dat)
 export(gen_elnet_data)
+export(jacobi_parallel)
+import(doParallel)
+import(foreach)

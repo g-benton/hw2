@@ -5,7 +5,7 @@
 #' @param  y response variable
 #' @param  subsample Should subsamples be taken uniformly or according to leverage
 #'    scores? Options are 'unif' and 'lev'. Default='unif'
-#' @param  r Size of subsample, defaults to ~10% of data
+#' @param  r Size of subsample, defaults to ~10 percent of data
 #' @return Returns lm class predicted
 #' @export
 #' @examples
